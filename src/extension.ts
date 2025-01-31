@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { generateCompletionPrompt } from './prompt';
 
 /**
  * Configuration interface for Ollama LLM service
@@ -163,12 +164,11 @@ class LLMInlineCompletionProvider implements vscode.InlineCompletionItemProvider
 					// Get the language ID for better context
 					const languageId = document.languageId;
 
-					const prompt = `[INST]You are a code completion assistant. Given this ${languageId} code:
-
-${precedingText}
-${textBeforeCursor}
-
-Complete this line of code. Only output the completion, no explanations.[/INST]`;
+					const prompt = generateCompletionPrompt(
+						languageId,
+						precedingText,
+						textBeforeCursor
+					);
 
 					this.log(`Generating completion for language: ${languageId}`);
 					this.log(`Context:\n${precedingText}`);
