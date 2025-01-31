@@ -147,13 +147,23 @@ class LLMInlineCompletionProvider implements vscode.InlineCompletionItemProvider
 					
 					const textAfterCursor = lineText.substring(position.character);
 
-					// Get some context from previous lines (up to 10 lines)
+					// Get some context from surrounding lines (up to 10 lines before and after)
 					const startLine = Math.max(0, position.line - 10);
+					const endLine = Math.min(document.lineCount - 1, position.line + 10);
 					const contextLines = [];
+					
+					// Get preceding lines
 					for (let i = startLine; i < position.line; i++) {
 						contextLines.push(document.lineAt(i).text);
 					}
 					const precedingText = contextLines.join('\n');
+
+					// Get following lines
+					const followingLines = [];
+					for (let i = position.line + 1; i <= endLine; i++) {
+						followingLines.push(document.lineAt(i).text);
+					}
+					const followingText = followingLines.join('\n');
 
 					// Get the language ID for better context
 					const languageId = document.languageId;
@@ -161,7 +171,8 @@ class LLMInlineCompletionProvider implements vscode.InlineCompletionItemProvider
 					const prompt = generateCompletionPrompt(
 						languageId,
 						precedingText,
-						lineText
+						lineText,
+						followingText
 					);
 
 					this.log(`Generating completion for language: ${languageId}`);
@@ -195,7 +206,7 @@ class LLMInlineCompletionProvider implements vscode.InlineCompletionItemProvider
 					}
 
 					const data = await response.json() as OllamaGenerateResponse;
-					let suggestion = data.response;
+					const suggestion = data.response;
 
 					// Log the raw suggestion
 					this.log(`Raw suggestion: ${suggestion}`);
