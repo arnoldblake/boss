@@ -1,5 +1,7 @@
 # boss README
 
+https://github.com/user-attachments/assets/993e086d-cb4f-4cfe-a4e5-202d7a482b73
+
 Selfhosted AI tab completion using Ollama. Boss can provide AI generated tab autocompletion using your selfhosted Ollama instance.
 
 ## Features
