@@ -1,6 +1,6 @@
 # boss README
 
-Selfhosted AI tab completion using Ollama.
+Selfhosted AI tab completion using Ollama. Boss can provide AI generated tab autocompletion using your selfhosted Ollama instance.
 
 ## Features
 
@@ -8,13 +8,13 @@ Selfhosted AI tab completion using Ollama.
 - Configurable Ollama host and model
 - Status bar indicator for Ollama service status
 - Output channel for logging and debugging
-- Context-aware completions with preceding lines
+- Context-aware completions
 - Debounce mechanism to prevent excessive requests
 
 ## Requirements
 
 - Ollama installed and running on your machine
-- VS Code installed on your machine
+- VS Code or compatible fork installed on your machine
 
 ## Extension Settings
 
@@ -27,35 +27,16 @@ This extension contributes the following settings:
 - `myExtension.enable`: Enable/disable this extension.
 - `myExtension.thing`: Set to `blah` to do something.
 
+## Debugging
+
+cmd+shift+p -> Show Output Windows -> boss
+
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+This is still a prototype and has some issues.
 
 ## Release Notes
 
 ### 0.0.1
 
 Proof of concept completed using Ollama and llama3.2:3b.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-- [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-- Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-- Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-- Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-- [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-- [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
