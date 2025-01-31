@@ -103,10 +103,9 @@ class LLMInlineCompletionProvider implements vscode.InlineCompletionItemProvider
 	): Promise<vscode.InlineCompletionItem[] | vscode.InlineCompletionList | null | undefined> {
 		// Get the current line text and check if we have enough characters
 		const lineText = document.lineAt(position.line).text;
-		const textBeforeCursor = lineText.substring(0, position.character);
 		
 		// Only proceed if we have at least 5 non-whitespace characters
-		if (textBeforeCursor.trim().length < 5) {
+		if (lineText.length < 5) {
 			return undefined;
 		}
 
@@ -162,12 +161,12 @@ class LLMInlineCompletionProvider implements vscode.InlineCompletionItemProvider
 					const prompt = generateCompletionPrompt(
 						languageId,
 						precedingText,
-						textBeforeCursor
+						lineText
 					);
 
 					this.log(`Generating completion for language: ${languageId}`);
 					this.log(`Context:\n${precedingText}`);
-					this.log(`Current line: ${textBeforeCursor}|cursor|${textAfterCursor}`);
+					this.log(`Current line: ${lineText}|cursor|${textAfterCursor}`);
 
 					const response = await fetch(`${this.config.host}/api/generate`, {
 						method: 'POST',
@@ -185,6 +184,7 @@ class LLMInlineCompletionProvider implements vscode.InlineCompletionItemProvider
 								top_p: 0.9,
 								repeat_penalty: 1.1,
 								stop: ["\n", "[/INST]", "[INST]"]
+
 							}
 						} as OllamaGenerateRequest)
 					});
@@ -195,36 +195,19 @@ class LLMInlineCompletionProvider implements vscode.InlineCompletionItemProvider
 					}
 
 					const data = await response.json() as OllamaGenerateResponse;
-					let suggestion = data.response?.trim();
+					let suggestion = data.response;
 
 					// Log the raw suggestion
 					this.log(`Raw suggestion: ${suggestion}`);
 
 					if (suggestion) {
-						// Clean up the suggestion
-						suggestion = suggestion
-							.replace(/^[`'"]+|[`'"]+$/g, '')  // Remove quotes/backticks
-							.split('\n')[0]                   // Take only the first line
-							.trim();
+						const range = new vscode.Range(
+							position.line, 0,
+							position.line, suggestion.length
+						);
+						resolve([new vscode.InlineCompletionItem(suggestion, range)]);
 
-						// If the suggestion repeats the entire line, extract only the completion part
-						if (suggestion.startsWith(textBeforeCursor)) {
-							suggestion = suggestion.slice(textBeforeCursor.length);
-						}
-						
-						this.log(`Cleaned suggestion: ${suggestion}`);
-						
-						if (suggestion && suggestion.length > 0) {
-							this.updateStatusBar('ready');
-							const range = new vscode.Range(
-								position.line, position.character,
-								position.line, position.character
-							);
-							resolve([new vscode.InlineCompletionItem(suggestion, range)]);
-							return;
-						}
 					}
-
 					this.updateStatusBar('ready');
 					resolve(undefined);
 				} catch (error: unknown) {
