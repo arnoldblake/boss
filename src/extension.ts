@@ -2,17 +2,12 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { generateCompletionPrompt } from './prompt';
-
-/**
- * Configuration interface for Ollama LLM service
- * @interface OllamaConfig
- * @property {string} host - The URL of the Ollama service
- * @property {string} model - The name of the LLM model to use
- */
-interface OllamaConfig {
-	host: string;
-	model: string;
-}
+import { 
+	OllamaConfig, 
+	OllamaTagsResponse, 
+	OllamaGenerateResponse,
+	OllamaGenerateRequest 
+} from './types';
 
 /**
  * Provides AI-powered inline code completions using the Ollama LLM service.
@@ -67,8 +62,8 @@ class LLMInlineCompletionProvider implements vscode.InlineCompletionItemProvider
 			if (!response.ok) {
 				throw new Error('Ollama service not available');
 			}
-			const data = await response.json() as { models: Array<{ name: string }> };
-			const modelExists = data.models?.some(m => m.name === this.config.model);
+			const data = await response.json() as OllamaTagsResponse;
+			const modelExists = data.models?.some((m: { name: string }) => m.name === this.config.model);
 			
 			if (!modelExists) {
 				this.updateStatusBar('model not found');
@@ -191,7 +186,7 @@ class LLMInlineCompletionProvider implements vscode.InlineCompletionItemProvider
 								repeat_penalty: 1.1,
 								stop: ["\n", "[/INST]", "[INST]"]
 							}
-						})
+						} as OllamaGenerateRequest)
 					});
 
 					if (!response.ok) {
@@ -199,7 +194,7 @@ class LLMInlineCompletionProvider implements vscode.InlineCompletionItemProvider
 						throw new Error(`Ollama API error: ${response.statusText}. ${errorText}`);
 					}
 
-					const data = await response.json() as { response: string };
+					const data = await response.json() as OllamaGenerateResponse;
 					let suggestion = data.response?.trim();
 
 					// Log the raw suggestion
